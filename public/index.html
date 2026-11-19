@@ -252,11 +252,11 @@
   <!-- ═══════════════ MODALS ═══════════════ -->
 
   <!-- Modal: Nueva Actividad -->
-  <div class="modal-overlay hidden" id="modal-activity">
+  <div class="modal-overlay hidden" id="modal-activity" onclick="if(event.target===this)closeModal('modal-activity')">
     <div class="modal">
       <div class="modal-header">
         <h3>Nueva actividad</h3>
-        <button class="modal-close" data-close="modal-activity"><i data-lucide="x"></i></button>
+        <button type="button" class="modal-close" onclick="closeModal('modal-activity')"><i data-lucide="x"></i></button>
       </div>
       <form id="form-activity">
         <div class="form-group">
@@ -294,7 +294,7 @@
           <input type="text" id="act-desc" placeholder="Detalles adicionales...">
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn-secondary" data-close="modal-activity">Cancelar</button>
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-activity')">Cancelar</button>
           <button type="submit" class="btn-primary">Crear actividad</button>
         </div>
       </form>
@@ -302,11 +302,11 @@
   </div>
 
   <!-- Modal: Nueva Materia -->
-  <div class="modal-overlay hidden" id="modal-subject">
+  <div class="modal-overlay hidden" id="modal-subject" onclick="if(event.target===this)closeModal('modal-subject')">
     <div class="modal">
       <div class="modal-header">
         <h3>Nueva materia</h3>
-        <button class="modal-close" data-close="modal-subject"><i data-lucide="x"></i></button>
+        <button type="button" class="modal-close" onclick="closeModal('modal-subject')"><i data-lucide="x"></i></button>
       </div>
       <form id="form-subject">
         <div class="form-group">
@@ -327,7 +327,7 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn-secondary" data-close="modal-subject">Cancelar</button>
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-subject')">Cancelar</button>
           <button type="submit" class="btn-primary">Crear materia</button>
         </div>
       </form>
@@ -335,11 +335,11 @@
   </div>
 
   <!-- Modal: Nuevo Examen -->
-  <div class="modal-overlay hidden" id="modal-exam">
+  <div class="modal-overlay hidden" id="modal-exam" onclick="if(event.target===this)closeModal('modal-exam')">
     <div class="modal">
       <div class="modal-header">
         <h3>Nuevo examen</h3>
-        <button class="modal-close" data-close="modal-exam"><i data-lucide="x"></i></button>
+        <button type="button" class="modal-close" onclick="closeModal('modal-exam')"><i data-lucide="x"></i></button>
       </div>
       <form id="form-exam">
         <div class="form-group">
@@ -363,7 +363,7 @@
           <input type="text" id="exam-desc" placeholder="Temas del examen...">
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn-secondary" data-close="modal-exam">Cancelar</button>
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-exam')">Cancelar</button>
           <button type="submit" class="btn-primary">Crear examen</button>
         </div>
       </form>

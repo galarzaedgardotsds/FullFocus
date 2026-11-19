@@ -602,13 +602,16 @@ function setupEventListeners() {
   });
 
   // ── Logout ──
-  document.getElementById('btn-logout').addEventListener('click', () => {
-    if (confirm('¿Cerrar sesión?')) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login.html';
-    }
-  });
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      if (confirm('¿Cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login.html';
+      }
+    });
+  }
 
   // ── Modal close buttons ──
   document.addEventListener('click', (e) => {
