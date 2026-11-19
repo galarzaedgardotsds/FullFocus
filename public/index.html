@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FullFocus — Tu estudio, en orden</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-icon">
+            <i data-lucide="check"></i>
+          </div>
+          <span class="brand-name">FullFocus</span>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item active" data-view="tablero">
+            <span class="nav-left"><i data-lucide="layout-grid"></i> Tablero</span>
+          </a>
+          <a href="#" class="nav-item" data-view="clases">
+            <span class="nav-left"><i data-lucide="sun"></i> Clases</span>
+            <span class="nav-badge" id="nav-subjects-count">0</span>
+          </a>
+          <a href="#" class="nav-item" data-view="examenes">
+            <span class="nav-left"><i data-lucide="calendar"></i> Exámenes</span>
+            <span class="nav-badge" id="nav-exams-count">0</span>
+          </a>
+        </nav>
+
+        <div class="subjects-section">
+          <div class="section-label">
+            <span>MIS MATERIAS</span>
+            <button class="icon-btn-tiny" id="btn-add-subject" aria-label="Añadir materia">
+              <i data-lucide="plus"></i>
+            </button>
+          </div>
+          <ul class="subjects-list" id="subjects-list">
+            <!-- Dynamic -->
+          </ul>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-title">
+          <i data-lucide="sparkles"></i>
+          <span>Estudia un tema a la vez</span>
+        </div>
+        <p>Completa una materia antes de pasar a la siguiente.</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+      <!-- BARRA SUPERIOR -->
+      <header class="topbar">
+        <div class="greeting">
+          <h2 id="greeting-text">Hola</h2>
+          <span id="greeting-date"></span>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="search-input" placeholder="Buscar actividades...">
+            <kbd>⌘ K</kbd>
+          </div>
+          <button class="notif-btn" id="btn-logout" aria-label="Cerrar sesión" title="Cerrar sesión">
+            <i data-lucide="log-out"></i>
+          </button>
+          <button class="btn-primary" id="btn-new-activity">
+            <i data-lucide="plus"></i> Nueva actividad
+          </button>
+        </div>
+      </header>
+
+      <!-- ENCABEZADO DE SECCIÓN -->
+      <section class="page-header">
+        <div>
+          <h1>Tu estudio, en orden</h1>
+          <p>Prioriza tus materias y avanza con calma.</p>
+        </div>
+        <button class="cycle-dropdown" id="btn-date-display">
+          <i data-lucide="calendar"></i>
+          <span id="cycle-label">Hoy</span>
+          <i data-lucide="chevron-down"></i>
+        </button>
+      </section>
+
+      <!-- TARJETAS DE MÉTRICAS -->
+      <section class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-icon icon-green">
+            <i data-lucide="check-circle-2"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Estudiadas</span>
+            <div class="stat-value">
+              <strong id="stat-completed">0</strong> <small id="stat-completed-sub">de 0 actividades</small>
+            </div>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon icon-amber">
+            <i data-lucide="hourglass"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Por estudiar</span>
+            <div class="stat-value">
+              <strong id="stat-pending">0</strong> <small class="text-amber" id="stat-pending-sub"></small>
+            </div>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon icon-coral">
+            <i data-lucide="flame"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Racha de estudio</span>
+            <div class="stat-value">
+              <strong id="stat-streak">0</strong> <small class="text-coral">días seguidos</small>
+            </div>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon icon-blue">
+            <i data-lucide="calendar-clock"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Este ciclo</span>
+            <div class="stat-value">
+              <strong id="stat-cycle">0</strong> <small class="text-blue" id="stat-cycle-sub"></small>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- GRILLA PRINCIPAL (2 COLUMNAS) -->
+      <section class="dashboard-grid">
+        <!-- COLUMNA IZQUIERDA -->
+        <div class="left-column">
+          <div class="card activities-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Actividades de hoy</h3>
+                <span class="pill-green" id="activities-count-pill">0 actividades</span>
+              </div>
+              <button class="sort-btn" id="btn-sort">
+                <i data-lucide="arrow-up-down"></i> Ordenar
+              </button>
+            </div>
+
+            <div class="filter-tabs" id="filter-tabs">
+              <button class="filter-tab active" data-filter="all">Todas</button>
+              <button class="filter-tab" data-filter="pending">Por estudiar</button>
+              <button class="filter-tab" data-filter="exams">Exámenes</button>
+              <button class="filter-tab" data-filter="completed">Estudiadas</button>
+            </div>
+
+            <ul class="task-list" id="task-list">
+              <!-- Dynamic -->
+            </ul>
+
+            <div class="empty-state hidden" id="empty-activities">
+              <i data-lucide="inbox"></i>
+              <p>No hay actividades para hoy. ¡Añadí una!</p>
+            </div>
+
+            <div class="add-task-row">
+              <button class="add-task-btn" id="btn-add-task-inline">
+                <span class="plus-circle"><i data-lucide="plus"></i></span>
+                Añadir una actividad para hoy
+              </button>
+              <span class="shortcut-hint">Pulsa N</span>
+            </div>
+          </div>
+
+          <!-- BANNER DE ENFOQUE -->
+          <div class="focus-banner">
+            <div class="progress-ring" id="focus-ring" style="--percent: 0;">
+              <span id="focus-percent">0%</span>
+            </div>
+            <div class="focus-text">
+              <span class="focus-kicker">TU ENFOQUE DE HOY</span>
+              <h3 id="focus-title">0 de 0 actividades completadas</h3>
+              <p id="focus-desc">Empezá tu día completando tu primera actividad.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA -->
+        <div class="right-column">
+          <!-- PRÓXIMOS EXÁMENES -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Próximos exámenes</h3>
+              <button class="card-link" id="btn-add-exam">+ Nuevo</button>
+            </div>
+
+            <ul class="exams-list" id="exams-list">
+              <!-- Dynamic -->
+            </ul>
+            <div class="empty-state hidden" id="empty-exams">
+              <p>No hay exámenes próximos</p>
+            </div>
+          </div>
+
+          <!-- MATERIAS ACTIVAS -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Materias activas</h3>
+            </div>
+
+            <div class="progress-list" id="subjects-progress">
+              <!-- Dynamic -->
+            </div>
+            <div class="empty-state hidden" id="empty-progress">
+              <p>Creá materias para ver tu progreso</p>
+            </div>
+          </div>
+
+          <!-- PLANIFICA TU CICLO -->
+          <a href="#" class="plan-card" id="btn-plan-cycle">
+            <div class="plan-icon">
+              <i data-lucide="calendar-plus"></i>
+            </div>
+            <div class="plan-text">
+              <strong>Planifica tu ciclo</strong>
+              <span>Reserva 10 minutos para ordenar tus próximos días.</span>
+            </div>
+            <i data-lucide="arrow-right" class="plan-arrow"></i>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ═══════════════ MODALS ═══════════════ -->
+
+  <!-- Modal: Nueva Actividad -->
+  <div class="modal-overlay hidden" id="modal-activity">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nueva actividad</h3>
+        <button class="modal-close" data-close="modal-activity"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-activity">
+        <div class="form-group">
+          <label for="act-title">Título</label>
+          <input type="text" id="act-title" placeholder="¿Qué vas a estudiar?" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="act-subject">Materia</label>
+            <select id="act-subject">
+              <option value="">Sin materia</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="act-priority">Prioridad</label>
+            <select id="act-priority">
+              <option value="alta">Alta</option>
+              <option value="media" selected>Media</option>
+              <option value="baja">Baja</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="act-date">Fecha</label>
+            <input type="date" id="act-date">
+          </div>
+          <div class="form-group">
+            <label for="act-time">Hora</label>
+            <input type="time" id="act-time">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="act-desc">Descripción (opcional)</label>
+          <input type="text" id="act-desc" placeholder="Detalles adicionales...">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="modal-activity">Cancelar</button>
+          <button type="submit" class="btn-primary">Crear actividad</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Nueva Materia -->
+  <div class="modal-overlay hidden" id="modal-subject">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nueva materia</h3>
+        <button class="modal-close" data-close="modal-subject"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-subject">
+        <div class="form-group">
+          <label for="subj-name">Nombre</label>
+          <input type="text" id="subj-name" placeholder="Ej: Matemática" required>
+        </div>
+        <div class="form-group">
+          <label>Color</label>
+          <div class="color-picker" id="color-picker">
+            <button type="button" class="color-dot selected" data-color="blue" style="background:#4a6b82"></button>
+            <button type="button" class="color-dot" data-color="terracotta" style="background:#b85c38"></button>
+            <button type="button" class="color-dot" data-color="amber" style="background:#d69436"></button>
+            <button type="button" class="color-dot" data-color="purple" style="background:#6f5b87"></button>
+            <button type="button" class="color-dot" data-color="green" style="background:#4f6d52"></button>
+            <button type="button" class="color-dot" data-color="red" style="background:#c0392b"></button>
+            <button type="button" class="color-dot" data-color="pink" style="background:#c06090"></button>
+            <button type="button" class="color-dot" data-color="teal" style="background:#2c8c99"></button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="modal-subject">Cancelar</button>
+          <button type="submit" class="btn-primary">Crear materia</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Nuevo Examen -->
+  <div class="modal-overlay hidden" id="modal-exam">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nuevo examen</h3>
+        <button class="modal-close" data-close="modal-exam"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-exam">
+        <div class="form-group">
+          <label for="exam-title">Título</label>
+          <input type="text" id="exam-title" placeholder="Ej: Examen de Historia" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="exam-subject">Materia</label>
+            <select id="exam-subject">
+              <option value="">Sin materia</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="exam-date">Fecha</label>
+            <input type="date" id="exam-date" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="exam-desc">Descripción (opcional)</label>
+          <input type="text" id="exam-desc" placeholder="Temas del examen...">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="modal-exam">Cancelar</button>
+          <button type="submit" class="btn-primary">Crear examen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
