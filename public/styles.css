@@ -1379,6 +1379,11 @@ button {
   height: 32px;
   border-radius: 10px;
   transition: background 0.15s;
+  cursor: pointer;
+}
+
+.modal-close * {
+  pointer-events: none;
 }
 
 .modal-close:hover {

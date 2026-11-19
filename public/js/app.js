@@ -611,15 +611,18 @@ function setupEventListeners() {
   });
 
   // ── Modal close buttons ──
-  document.querySelectorAll('[data-close]').forEach(btn => {
-    btn.addEventListener('click', () => closeModal(btn.dataset.close));
-  });
+  document.addEventListener('click', (e) => {
+    const closeBtn = e.target.closest('[data-close]');
+    if (closeBtn) {
+      e.preventDefault();
+      closeModal(closeBtn.dataset.close);
+      return;
+    }
 
-  // ── Close modal on overlay click ──
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeModal(overlay.id);
-    });
+    // Cerrar al hacer clic en el fondo oscuro
+    if (e.target.classList.contains('modal-overlay')) {
+      closeModal(e.target.id);
+    }
   });
 
   // ── Keyboard shortcuts ──
