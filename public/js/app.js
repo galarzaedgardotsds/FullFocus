@@ -506,15 +506,39 @@ function setupEventListeners() {
 
   document.getElementById('form-activity').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const titleInput = document.getElementById('act-title');
+    const dateInput = document.getElementById('act-date');
+    let hasError = false;
+
+    if (!titleInput.value.trim()) {
+      markFieldInvalid(titleInput, 'Ingresá el título de la actividad');
+      hasError = true;
+    } else {
+      markFieldValid(titleInput);
+    }
+
+    if (!dateInput.value) {
+      markFieldInvalid(dateInput, 'Seleccioná una fecha');
+      hasError = true;
+    } else {
+      markFieldValid(dateInput);
+    }
+
+    if (hasError) {
+      const firstInvalid = document.querySelector('#modal-activity .input-error');
+      if (firstInvalid) firstInvalid.focus();
+      toast('Completá los campos obligatorios');
+      return;
+    }
+
     const data = {
-      title: document.getElementById('act-title').value.trim(),
+      title: titleInput.value.trim(),
       subject_id: document.getElementById('act-subject').value || null,
       priority: document.getElementById('act-priority').value,
-      scheduled_date: document.getElementById('act-date').value || todayStr(),
+      scheduled_date: dateInput.value || todayStr(),
       scheduled_time: document.getElementById('act-time').value || null,
       description: document.getElementById('act-desc').value.trim()
     };
-    if (!data.title) return;
     try {
       await API.post('/activities', data);
       closeModal('modal-activity');
@@ -541,10 +565,17 @@ function setupEventListeners() {
 
   document.getElementById('form-subject').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('subj-name').value.trim();
-    if (!name) return;
+    const nameInput = document.getElementById('subj-name');
+    if (!nameInput.value.trim()) {
+      markFieldInvalid(nameInput, 'Ingresá el nombre de la materia');
+      nameInput.focus();
+      toast('Completá el nombre de la materia');
+      return;
+    }
+    markFieldValid(nameInput);
+
     try {
-      await API.post('/subjects', { name, color: selectedColor });
+      await API.post('/subjects', { name: nameInput.value.trim(), color: selectedColor });
       closeModal('modal-subject');
       e.target.reset();
       selectedColor = 'blue';
@@ -562,13 +593,37 @@ function setupEventListeners() {
 
   document.getElementById('form-exam').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const titleInput = document.getElementById('exam-title');
+    const dateInput = document.getElementById('exam-date');
+    let hasError = false;
+
+    if (!titleInput.value.trim()) {
+      markFieldInvalid(titleInput, 'Ingresá el título del examen');
+      hasError = true;
+    } else {
+      markFieldValid(titleInput);
+    }
+
+    if (!dateInput.value) {
+      markFieldInvalid(dateInput, 'Seleccioná la fecha del examen');
+      hasError = true;
+    } else {
+      markFieldValid(dateInput);
+    }
+
+    if (hasError) {
+      const firstInvalid = document.querySelector('#modal-exam .input-error');
+      if (firstInvalid) firstInvalid.focus();
+      toast('Completá los campos obligatorios');
+      return;
+    }
+
     const data = {
-      title: document.getElementById('exam-title').value.trim(),
+      title: titleInput.value.trim(),
       subject_id: document.getElementById('exam-subject').value || null,
-      exam_date: document.getElementById('exam-date').value,
+      exam_date: dateInput.value,
       description: document.getElementById('exam-desc').value.trim()
     };
-    if (!data.title || !data.exam_date) return;
     try {
       await API.post('/exams', data);
       closeModal('modal-exam');
@@ -646,6 +701,18 @@ function setupEventListeners() {
     }
   });
 
+  // ── Clear field error on typing/changing ──
+  document.addEventListener('input', (e) => {
+    if (e.target.classList.contains('input-error')) {
+      markFieldValid(e.target);
+    }
+  });
+  document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('input-error')) {
+      markFieldValid(e.target);
+    }
+  });
+
   // Set default date to today in activity form
   document.getElementById('act-date').value = todayStr();
 }
@@ -653,12 +720,45 @@ function setupEventListeners() {
 // ══════════════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════════════
+function markFieldInvalid(input, message = 'Este campo es obligatorio') {
+  if (!input) return;
+  input.classList.add('input-error');
+  const parent = input.closest('.form-group');
+  if (parent) {
+    let errorMsg = parent.querySelector('.field-error-msg');
+    if (!errorMsg) {
+      errorMsg = document.createElement('span');
+      errorMsg.className = 'field-error-msg';
+      parent.appendChild(errorMsg);
+    }
+    errorMsg.textContent = message;
+  }
+}
+
+function markFieldValid(input) {
+  if (!input) return;
+  input.classList.remove('input-error');
+  const parent = input.closest('.form-group');
+  if (parent) {
+    const errorMsg = parent.querySelector('.field-error-msg');
+    if (errorMsg) errorMsg.remove();
+  }
+}
+
+function clearModalErrors(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+  modal.querySelectorAll('.field-error-msg').forEach(el => el.remove());
+}
+
 function openModal(id) {
+  clearModalErrors(id);
   const modal = document.getElementById(id);
   modal.classList.remove('hidden');
   // Focus first input
   setTimeout(() => {
-    const input = modal.querySelector('input, select');
+    const input = modal.querySelector('input:not([type="hidden"]), select');
     if (input) input.focus();
   }, 100);
   // Refresh subject dropdowns
@@ -666,6 +766,7 @@ function openModal(id) {
 }
 
 function closeModal(id) {
+  clearModalErrors(id);
   document.getElementById(id).classList.add('hidden');
 }
 

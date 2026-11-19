@@ -258,9 +258,9 @@
         <h3>Nueva actividad</h3>
         <button type="button" class="modal-close" onclick="closeModal('modal-activity')"><i data-lucide="x"></i></button>
       </div>
-      <form id="form-activity">
+      <form id="form-activity" novalidate>
         <div class="form-group">
-          <label for="act-title">Título</label>
+          <label for="act-title">Título <span class="required-star">*</span></label>
           <input type="text" id="act-title" placeholder="¿Qué vas a estudiar?" required>
         </div>
         <div class="form-row">
@@ -281,8 +281,8 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="act-date">Fecha</label>
-            <input type="date" id="act-date">
+            <label for="act-date">Fecha <span class="required-star">*</span></label>
+            <input type="date" id="act-date" required>
           </div>
           <div class="form-group">
             <label for="act-time">Hora</label>
@@ -308,9 +308,9 @@
         <h3>Nueva materia</h3>
         <button type="button" class="modal-close" onclick="closeModal('modal-subject')"><i data-lucide="x"></i></button>
       </div>
-      <form id="form-subject">
+      <form id="form-subject" novalidate>
         <div class="form-group">
-          <label for="subj-name">Nombre</label>
+          <label for="subj-name">Nombre <span class="required-star">*</span></label>
           <input type="text" id="subj-name" placeholder="Ej: Matemática" required>
         </div>
         <div class="form-group">
@@ -341,9 +341,9 @@
         <h3>Nuevo examen</h3>
         <button type="button" class="modal-close" onclick="closeModal('modal-exam')"><i data-lucide="x"></i></button>
       </div>
-      <form id="form-exam">
+      <form id="form-exam" novalidate>
         <div class="form-group">
-          <label for="exam-title">Título</label>
+          <label for="exam-title">Título <span class="required-star">*</span></label>
           <input type="text" id="exam-title" placeholder="Ej: Examen de Historia" required>
         </div>
         <div class="form-row">
@@ -354,7 +354,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="exam-date">Fecha</label>
+            <label for="exam-date">Fecha <span class="required-star">*</span></label>
             <input type="date" id="exam-date" required>
           </div>
         </div>
