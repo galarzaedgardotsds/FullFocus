@@ -359,8 +359,11 @@ function renderStats() {
   document.getElementById('stat-cycle-sub').textContent = s.cycle.exams > 0 ? `${s.cycle.exams} entrega${s.cycle.exams > 1 ? 's' : ''}` : '';
 
   // Focus banner
-  document.getElementById('focus-ring').style.setProperty('--percent', s.focusPercent);
-  document.getElementById('focus-percent').textContent = `${s.focusPercent}%`;
+  const pct = s.focusPercent || 0;
+  const ring = document.getElementById('focus-ring');
+  ring.style.setProperty('--percent', pct);
+  ring.style.background = `conic-gradient(#e7efe8 ${pct}%, rgba(255, 255, 255, 0.14) 0)`;
+  document.getElementById('focus-percent').textContent = `${pct}%`;
   document.getElementById('focus-title').textContent = `${s.today.completed} de ${s.today.total} actividades completadas`;
 
   if (s.today.total === 0) {
