@@ -1,10 +1,8 @@
 // ── Auth Page Logic ───────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Redirect if already logged in
-  if (localStorage.getItem('token')) {
-    window.location.href = '/';
-    return;
-  }
+  // Clear any old/corrupted token when on the login page
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
