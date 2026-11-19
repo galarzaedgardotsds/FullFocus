@@ -108,12 +108,12 @@ function renderSubjects() {
 
   // Click to filter
   list.querySelectorAll('.subject-item').forEach(el => {
-    el.addEventListener('click', (e) => {
+    el.addEventListener('click', async (e) => {
       e.preventDefault();
       const id = parseInt(el.dataset.id);
       selectedSubjectFilter = selectedSubjectFilter === id ? null : id;
       renderSubjects();
-      renderActivities();
+      await loadActivities();
     });
   });
 }
@@ -134,7 +134,14 @@ function populateSubjectDropdowns() {
 // ══════════════════════════════════════════════════════════
 async function loadActivities() {
   try {
-    activities = await API.get(`/activities?date=${currentDate}`);
+    // Si hay una materia seleccionada en el sidebar, traemos todas sus actividades (o las de la fecha si no)
+    let url = `/activities?`;
+    if (selectedSubjectFilter) {
+      url += `subject_id=${selectedSubjectFilter}`;
+    } else {
+      url += `date=${currentDate}`;
+    }
+    activities = await API.get(url);
     renderActivities();
   } catch (err) {
     console.error('Error loading activities:', err);
@@ -148,7 +155,7 @@ function renderActivities() {
 
   let filtered = [...activities];
 
-  // Apply subject filter from sidebar
+  // Apply subject filter if any
   if (selectedSubjectFilter) {
     filtered = filtered.filter(a => a.subject_id === selectedSubjectFilter);
   }
@@ -182,15 +189,34 @@ function renderActivities() {
   if (filtered.length === 0) {
     list.innerHTML = '';
     empty.classList.remove('hidden');
+    const emptyP = empty.querySelector('p');
+    if (emptyP) {
+      if (selectedSubjectFilter) {
+        const subjObj = subjects.find(s => s.id === selectedSubjectFilter);
+        emptyP.textContent = `No hay actividades para ${subjObj ? subjObj.name : 'esta materia'}.`;
+      } else {
+        emptyP.textContent = 'No hay actividades para esta fecha. ¡Añadí una!';
+      }
+    }
   } else {
     empty.classList.add('hidden');
     list.innerHTML = filtered.map(a => activityHTML(a)).join('');
     bindActivityEvents();
   }
 
-  // Update pill
+  // Update pill and header title
   const countPill = document.getElementById('activities-count-pill');
-  countPill.textContent = `${activities.length} actividad${activities.length !== 1 ? 'es' : ''}`;
+  countPill.textContent = `${filtered.length} actividad${filtered.length !== 1 ? 'es' : ''}`;
+
+  const sectionTitle = document.getElementById('activities-section-title');
+  if (sectionTitle) {
+    if (selectedSubjectFilter) {
+      const subjObj = subjects.find(s => s.id === selectedSubjectFilter);
+      sectionTitle.textContent = `Actividades de ${subjObj ? subjObj.name : 'Materia'}`;
+    } else {
+      updateDateLabel();
+    }
+  }
 
   lucide.createIcons();
 }
@@ -233,12 +259,21 @@ function bindActivityEvents() {
   document.querySelectorAll('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.toggle;
+      const act = activities.find(a => String(a.id) === String(id));
+      if (act) {
+        // Actualización optimista inmediata
+        act.completed = act.completed ? 0 : 1;
+        const total = activities.length;
+        const completed = activities.filter(a => a.completed).length;
+        updateFocusBanner(completed, total);
+        renderActivities();
+      }
       try {
         await API.patch(`/activities/${id}/toggle`);
-        await loadActivities();
-        await loadStats();
+        await Promise.all([loadActivities(), loadStats(), loadSubjects()]);
       } catch (err) {
         toast('Error al actualizar actividad');
+        await loadActivities();
       }
     });
   });
@@ -343,6 +378,32 @@ async function loadStats() {
   }
 }
 
+function updateFocusBanner(completed, total) {
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const ring = document.getElementById('focus-ring');
+  if (ring) {
+    ring.style.setProperty('--percent', pct);
+    ring.style.background = `conic-gradient(#e7efe8 ${pct}%, rgba(255, 255, 255, 0.14) 0)`;
+  }
+  const pctEl = document.getElementById('focus-percent');
+  if (pctEl) pctEl.textContent = `${pct}%`;
+
+  const titleEl = document.getElementById('focus-title');
+  if (titleEl) titleEl.textContent = `${completed} de ${total} actividades completadas`;
+
+  const descEl = document.getElementById('focus-desc');
+  if (descEl) {
+    if (total === 0) {
+      descEl.textContent = 'Añadí actividades para comenzar tu día.';
+    } else if (completed === total) {
+      descEl.textContent = '¡Felicitaciones! Completaste todas las actividades. 🎉';
+    } else {
+      const remaining = total - completed;
+      descEl.textContent = `Vas bien. Te quedan ${remaining} actividad${remaining > 1 ? 'es' : ''} por completar.`;
+    }
+  }
+}
+
 function renderStats() {
   const s = stats;
 
@@ -359,21 +420,7 @@ function renderStats() {
   document.getElementById('stat-cycle-sub').textContent = s.cycle.exams > 0 ? `${s.cycle.exams} entrega${s.cycle.exams > 1 ? 's' : ''}` : '';
 
   // Focus banner
-  const pct = s.focusPercent || 0;
-  const ring = document.getElementById('focus-ring');
-  ring.style.setProperty('--percent', pct);
-  ring.style.background = `conic-gradient(#e7efe8 ${pct}%, rgba(255, 255, 255, 0.14) 0)`;
-  document.getElementById('focus-percent').textContent = `${pct}%`;
-  document.getElementById('focus-title').textContent = `${s.today.completed} de ${s.today.total} actividades completadas`;
-
-  if (s.today.total === 0) {
-    document.getElementById('focus-desc').textContent = 'Añadí actividades para comenzar tu día.';
-  } else if (s.today.completed === s.today.total) {
-    document.getElementById('focus-desc').textContent = '¡Felicitaciones! Completaste todas las actividades del día. 🎉';
-  } else {
-    const remaining = s.today.pending;
-    document.getElementById('focus-desc').textContent = `Vas bien. Te quedan ${remaining} actividad${remaining > 1 ? 'es' : ''} por completar.`;
-  }
+  updateFocusBanner(s.today.completed, s.today.total);
 
   // Subjects progress
   const progressContainer = document.getElementById('subjects-progress');
@@ -410,10 +457,25 @@ function renderStats() {
 function setupEventListeners() {
   // ── Date Selector ──
   const dateInput = document.getElementById('date-selector');
+  const dateTrigger = document.getElementById('btn-date-trigger');
+  
+  if (dateTrigger && dateInput) {
+    dateTrigger.addEventListener('click', () => {
+      if (typeof dateInput.showPicker === 'function') {
+        dateInput.showPicker();
+      } else {
+        dateInput.focus();
+        dateInput.click();
+      }
+    });
+  }
+
   if (dateInput) {
     dateInput.addEventListener('change', async (e) => {
       if (e.target.value) {
         currentDate = e.target.value;
+        selectedSubjectFilter = null; // Reiniciar filtro de materia para ver ese día
+        renderSubjects();
         updateDateLabel();
         await Promise.all([loadActivities(), loadStats()]);
       }

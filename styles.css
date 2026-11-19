@@ -386,8 +386,12 @@ button {
   color: var(--text-secondary);
 }
 
-.cycle-dropdown {
+.date-picker-wrapper {
   position: relative;
+  display: inline-block;
+}
+
+.cycle-dropdown {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -400,13 +404,15 @@ button {
   color: var(--text-primary);
   cursor: pointer;
   user-select: none;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .cycle-dropdown:hover {
   background-color: #faf9f5;
+  border-color: #d8d4c7;
 }
 
-.hidden-date-input {
+.real-date-input {
   position: absolute;
   top: 0;
   left: 0;
@@ -414,6 +420,7 @@ button {
   height: 100%;
   opacity: 0;
   cursor: pointer;
+  z-index: 10;
 }
 
 .cycle-dropdown svg {
