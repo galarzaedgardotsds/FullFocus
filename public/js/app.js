@@ -15,15 +15,7 @@ let currentDate = todayStr();
 
 // ── Init ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-  const token = localStorage.getItem('token');
-  if (!token) { window.location.href = '/login.html'; return; }
-
-  try {
-    currentUser = await API.get('/auth/me');
-  } catch {
-    window.location.href = '/login.html';
-    return;
-  }
+  currentUser = { name: 'Estudiante' };
 
   updateGreeting();
   await refreshAll();

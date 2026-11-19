@@ -1,34 +1,44 @@
-// ── API Client ────────────────────────────────────────────
+// ── API / Storage Bridge ──────────────────────────────────
+// Funciona 100% en cliente con Storage garantizando que nunca se pierdan datos
 const API = {
-  base: '/api',
-
-  _headers() {
-    const h = { 'Content-Type': 'application/json' };
-    const token = localStorage.getItem('token');
-    if (token) h['Authorization'] = `Bearer ${token}`;
-    return h;
-  },
-
-  async request(method, path, body) {
-    const opts = { method, headers: this._headers() };
-    if (body) opts.body = JSON.stringify(body);
-
-    const res = await fetch(this.base + path, opts);
-    const data = await res.json().catch(() => null);
-
-    if (res.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login.html';
-      throw new Error('No autorizado');
+  async get(path) {
+    if (path === '/auth/me') return { id: 1, name: 'Estudiante' };
+    if (path.startsWith('/subjects')) return Storage.getSubjects();
+    if (path.startsWith('/exams')) return Storage.getExams();
+    if (path.startsWith('/stats')) {
+      const match = path.match(/date=([^&]+)/);
+      return Storage.getStats(match ? match[1] : null);
     }
-    if (!res.ok) throw new Error(data?.error || 'Error del servidor');
-    return data;
+    if (path.startsWith('/activities')) {
+      const url = new URL('http://local' + path);
+      return Storage.getActivities({
+        date: url.searchParams.get('date'),
+        subject_id: url.searchParams.get('subject_id'),
+        search: url.searchParams.get('search'),
+        status: url.searchParams.get('status')
+      });
+    }
+    return [];
   },
 
-  get(path)       { return this.request('GET', path); },
-  post(path, b)   { return this.request('POST', path, b); },
-  put(path, b)    { return this.request('PUT', path, b); },
-  patch(path, b)  { return this.request('PATCH', path, b); },
-  delete(path)    { return this.request('DELETE', path); },
+  async post(path, body) {
+    if (path === '/subjects') return Storage.createSubject(body.name, body.color);
+    if (path === '/activities') return Storage.createActivity(body);
+    if (path === '/exams') return Storage.createExam(body);
+    return {};
+  },
+
+  async patch(path) {
+    const match = path.match(/\/activities\/(\d+)\/toggle/);
+    if (match) return Storage.toggleActivity(match[1]);
+    return {};
+  },
+
+  async delete(path) {
+    const matchAct = path.match(/\/activities\/(\d+)/);
+    if (matchAct) return Storage.deleteActivity(matchAct[1]);
+    const matchExam = path.match(/\/exams\/(\d+)/);
+    if (matchExam) return Storage.deleteExam(matchExam[1]);
+    return {};
+  }
 };
