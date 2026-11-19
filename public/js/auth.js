@@ -1,8 +1,24 @@
 // ── Auth Page Logic ───────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  // Clear any old/corrupted token when on the login page
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+document.addEventListener('DOMContentLoaded', async () => {
+  // If user already has a valid token, verify it before sending to dashboard
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        window.location.href = '/';
+        return;
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    } catch {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  }
 
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');

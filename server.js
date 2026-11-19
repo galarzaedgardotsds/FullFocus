@@ -19,11 +19,13 @@ app.use('/api/activities', require('./routes/activities'));
 app.use('/api/exams', require('./routes/exams'));
 app.use('/api/stats', require('./routes/stats'));
 
-// SPA fallback — serve index.html for non-API, non-file routes
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  }
+// SPA fallback — serve index.html for root or non-API routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 app.listen(PORT, () => {
