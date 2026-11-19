@@ -457,10 +457,11 @@ function renderStats() {
 function setupEventListeners() {
   // ── Date Selector ──
   const dateInput = document.getElementById('date-selector');
-  const dateTrigger = document.getElementById('btn-date-trigger');
+  const dateWrapper = document.getElementById('date-picker-wrapper') || document.getElementById('btn-date-trigger');
   
-  if (dateTrigger && dateInput) {
-    dateTrigger.addEventListener('click', () => {
+  if (dateWrapper && dateInput) {
+    dateWrapper.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (typeof dateInput.showPicker === 'function') {
         dateInput.showPicker();
       } else {

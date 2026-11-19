@@ -88,13 +88,13 @@
           <h1>Tu estudio, en orden</h1>
           <p>Prioriza tus materias y avanza con calma.</p>
         </div>
-        <div class="date-picker-wrapper">
+        <div class="date-picker-wrapper" id="date-picker-wrapper">
           <button type="button" class="cycle-dropdown" id="btn-date-trigger">
             <i data-lucide="calendar"></i>
             <span id="cycle-label">Hoy</span>
             <i data-lucide="chevron-down"></i>
           </button>
-          <input type="date" id="date-selector" class="real-date-input">
+          <input type="date" id="date-selector" class="real-date-input" tabindex="-1" aria-hidden="true">
         </div>
       </section>
 
