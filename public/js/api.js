@@ -29,15 +29,15 @@ const API = {
   },
 
   async patch(path) {
-    const match = path.match(/\/activities\/(\d+)\/toggle/);
+    const match = path.match(/\/activities\/([^/]+)\/toggle/);
     if (match) return Storage.toggleActivity(match[1]);
     return {};
   },
 
   async delete(path) {
-    const matchAct = path.match(/\/activities\/(\d+)/);
+    const matchAct = path.match(/\/activities\/([^/]+)/);
     if (matchAct) return Storage.deleteActivity(matchAct[1]);
-    const matchExam = path.match(/\/exams\/(\d+)/);
+    const matchExam = path.match(/\/exams\/([^/]+)/);
     if (matchExam) return Storage.deleteExam(matchExam[1]);
     return {};
   }

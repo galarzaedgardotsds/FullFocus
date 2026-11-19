@@ -374,8 +374,7 @@ function updateFocusBanner(completed, total) {
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   const ring = document.getElementById('focus-ring');
   if (ring) {
-    ring.style.setProperty('--percent', pct);
-    ring.style.background = `conic-gradient(#e7efe8 ${pct}%, rgba(255, 255, 255, 0.14) 0)`;
+    ring.style.background = `conic-gradient(#e7efe8 ${pct}%, rgba(255, 255, 255, 0.14) ${pct}% 100%)`;
   }
   const pctEl = document.getElementById('focus-percent');
   if (pctEl) pctEl.textContent = `${pct}%`;
@@ -388,7 +387,7 @@ function updateFocusBanner(completed, total) {
     if (total === 0) {
       descEl.textContent = 'Añadí actividades para comenzar tu día.';
     } else if (completed === total) {
-      descEl.textContent = '¡Felicitaciones! Completaste todas las actividades. 🎉';
+      descEl.textContent = '¡Felicitaciones! Completaste todas las actividades del día. 🎉';
     } else {
       const remaining = total - completed;
       descEl.textContent = `Vas bien. Te quedan ${remaining} actividad${remaining > 1 ? 'es' : ''} por completar.`;

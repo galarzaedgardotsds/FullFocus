@@ -763,12 +763,11 @@ button {
   width: 66px;
   height: 66px;
   border-radius: 50%;
-  background: conic-gradient(#e7efe8 calc(var(--percent, 0) * 1%), rgba(255, 255, 255, 0.14) 0);
   display: grid;
   place-items: center;
   flex-shrink: 0;
   position: relative;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .progress-ring::before {
@@ -777,12 +776,15 @@ button {
   inset: 6px;
   border-radius: 50%;
   background-color: var(--bg-dark-banner);
+  z-index: 1;
 }
 
 .progress-ring span {
   position: relative;
+  z-index: 2;
   font-size: 0.9rem;
   font-weight: 600;
+  color: #fff;
 }
 
 .focus-kicker {

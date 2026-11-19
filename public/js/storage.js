@@ -126,8 +126,8 @@ const Storage = {
   },
 
   toggleActivity(id) {
-    const acts = this.getActivitiesRaw();
-    const act = acts.find(a => a.id === Number(id));
+    let acts = this.getActivitiesRaw();
+    const act = acts.find(a => String(a.id) === String(id));
     if (act) {
       act.completed = act.completed ? 0 : 1;
       act.completed_at = act.completed ? new Date().toISOString().split('T')[0] : null;
@@ -138,7 +138,7 @@ const Storage = {
 
   deleteActivity(id) {
     let acts = this.getActivitiesRaw();
-    acts = acts.filter(a => a.id !== Number(id));
+    acts = acts.filter(a => String(a.id) !== String(id));
     localStorage.setItem('ff_activities', JSON.stringify(acts));
   },
 
