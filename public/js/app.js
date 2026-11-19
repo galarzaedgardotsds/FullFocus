@@ -17,11 +17,37 @@ let currentDate = todayStr();
 document.addEventListener('DOMContentLoaded', async () => {
   currentUser = { name: 'Estudiante' };
 
+  initTheme();
   updateGreeting();
   await refreshAll();
   setupEventListeners();
   lucide.createIcons();
 });
+
+// ── Dark / Light Theme ────────────────────────────────────
+function initTheme() {
+  const saved = localStorage.getItem('ff_theme') || 'light';
+  applyTheme(saved);
+
+  const btnToggle = document.getElementById('btn-theme-toggle');
+  if (btnToggle) {
+    btnToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('ff_theme', next);
+    });
+  }
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('theme-icon');
+  if (icon) {
+    icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+    lucide.createIcons();
+  }
+}
 
 async function refreshAll() {
   await Promise.all([
