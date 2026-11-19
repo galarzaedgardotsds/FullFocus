@@ -387,6 +387,7 @@ button {
 }
 
 .cycle-dropdown {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -397,6 +398,22 @@ button {
   font-size: 0.83rem;
   font-weight: 500;
   color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.cycle-dropdown:hover {
+  background-color: #faf9f5;
+}
+
+.hidden-date-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .cycle-dropdown svg {

@@ -11,6 +11,7 @@ let stats = {};
 let currentFilter = 'all';
 let sortAsc = true;
 let selectedSubjectFilter = null;
+let currentDate = todayStr();
 
 // ── Init ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -52,6 +53,27 @@ function updateGreeting() {
   let dateStr = new Date().toLocaleDateString('es-ES', opts);
   dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
   document.getElementById('greeting-date').textContent = dateStr;
+
+  updateDateLabel();
+}
+
+function updateDateLabel() {
+  const isToday = currentDate === todayStr();
+  const label = document.getElementById('cycle-label');
+  const sectionTitle = document.getElementById('activities-section-title');
+  const dateInput = document.getElementById('date-selector');
+  if (dateInput) dateInput.value = currentDate;
+
+  if (isToday) {
+    label.textContent = 'Hoy';
+    if (sectionTitle) sectionTitle.textContent = 'Actividades de hoy';
+  } else {
+    const [y, m, d] = currentDate.split('-');
+    const dateObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+    const formatted = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    label.textContent = formatted;
+    if (sectionTitle) sectionTitle.textContent = `Actividades del ${formatted}`;
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -112,8 +134,7 @@ function populateSubjectDropdowns() {
 // ══════════════════════════════════════════════════════════
 async function loadActivities() {
   try {
-    const today = todayStr();
-    activities = await API.get(`/activities?date=${today}`);
+    activities = await API.get(`/activities?date=${currentDate}`);
     renderActivities();
   } catch (err) {
     console.error('Error loading activities:', err);
@@ -315,7 +336,7 @@ function renderExams() {
 // ══════════════════════════════════════════════════════════
 async function loadStats() {
   try {
-    stats = await API.get('/stats');
+    stats = await API.get(`/stats?date=${currentDate}`);
     renderStats();
   } catch (err) {
     console.error('Error loading stats:', err);
@@ -384,6 +405,18 @@ function renderStats() {
 //  EVENT LISTENERS
 // ══════════════════════════════════════════════════════════
 function setupEventListeners() {
+  // ── Date Selector ──
+  const dateInput = document.getElementById('date-selector');
+  if (dateInput) {
+    dateInput.addEventListener('change', async (e) => {
+      if (e.target.value) {
+        currentDate = e.target.value;
+        updateDateLabel();
+        await Promise.all([loadActivities(), loadStats()]);
+      }
+    });
+  }
+
   // ── New Activity ──
   document.getElementById('btn-new-activity').addEventListener('click', () => openModal('modal-activity'));
   document.getElementById('btn-add-task-inline').addEventListener('click', () => openModal('modal-activity'));

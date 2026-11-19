@@ -8,9 +8,10 @@ router.use(authMiddleware);
 // ── Estadísticas del dashboard ────────────────────────────
 router.get('/', (req, res) => {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = req.query.date || new Date().toISOString().split('T')[0];
+    const realToday = new Date().toISOString().split('T')[0];
 
-    // Activities today
+    // Activities for selected date
     const todayTotal = db.prepare(
       'SELECT COUNT(*) as c FROM activities WHERE user_id = ? AND scheduled_date = ?'
     ).get(req.userId, today).c;
@@ -21,10 +22,10 @@ router.get('/', (req, res) => {
 
     const todayPending = todayTotal - todayCompleted;
 
-    // Upcoming exams count
+    // Upcoming exams count (from real today onwards)
     const upcomingExams = db.prepare(
       'SELECT COUNT(*) as c FROM exams WHERE user_id = ? AND exam_date >= ?'
-    ).get(req.userId, today).c;
+    ).get(req.userId, realToday).c;
 
     // Total subjects
     const totalSubjects = db.prepare(

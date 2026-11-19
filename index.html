@@ -88,11 +88,14 @@
           <h1>Tu estudio, en orden</h1>
           <p>Prioriza tus materias y avanza con calma.</p>
         </div>
-        <button class="cycle-dropdown" id="btn-date-display">
-          <i data-lucide="calendar"></i>
-          <span id="cycle-label">Hoy</span>
-          <i data-lucide="chevron-down"></i>
-        </button>
+        <div class="date-picker-wrapper">
+          <label for="date-selector" class="cycle-dropdown">
+            <i data-lucide="calendar"></i>
+            <span id="cycle-label">Hoy</span>
+            <i data-lucide="chevron-down"></i>
+            <input type="date" id="date-selector" class="hidden-date-input">
+          </label>
+        </div>
       </section>
 
       <!-- TARJETAS DE MÉTRICAS -->
@@ -153,7 +156,7 @@
           <div class="card activities-card">
             <div class="card-header">
               <div class="card-title-group">
-                <h3>Actividades de hoy</h3>
+                <h3 id="activities-section-title">Actividades de hoy</h3>
                 <span class="pill-green" id="activities-count-pill">0 actividades</span>
               </div>
               <button class="sort-btn" id="btn-sort">
